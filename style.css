@@ -22,6 +22,66 @@ body {
   /*  */
 }
 
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  grid-gap: 10px;
+  max-width: 100%;
+  margin: 10px;
+  overflow: auto;
+}
+
+.grid-item {
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+}
+
+.gridWrap {
+  width: 90%;
+  max-width: 800px;
+  border-radius: 15px;
+  overflow:auto;
+
+  height: 500px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0);
+  backdrop-filter: blur(11px);
+  -webkit-backdrop-filter: blur(11px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+
+.gridWrap::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.gridWrap::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+
+
+.title {
+  font-weight: normal;
+  font-size: 20px;
+}
+
 .mask {
   transition: all 0.5s ease;
   position: absolute;
@@ -158,6 +218,11 @@ body {
 
   .bi-arrow-left .bi-arrow-right {
     font-size: 40px;
+  }
+
+  .gridContainer {
+    grid-template-columns: repeat(1, minmax(150px, 1fr));
+
   }
 
 
@@ -334,6 +399,22 @@ button:hover {
   font-size: 30px;
 }
 
+#closeLiked {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  margin-left: 5px;
+  font-size: 30px;
+}
+
+.navLikeButton {
+  border: none;
+  background-color: transparent;
+}
+
 
 
 .signInForm {
@@ -440,24 +521,6 @@ input {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .dropdown-content {
   display: none;
   position: fixed;
@@ -510,3 +573,6 @@ input {
   font-size: 20px;
   margin-left: 10px;
 }
+
+
+

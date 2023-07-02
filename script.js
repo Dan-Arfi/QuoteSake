@@ -48,9 +48,9 @@ const profilePictureDropDown = document.getElementById("profile-drop");
 const userNameDropDown = document.getElementById("dropdown-user");
 const closeDropdownButton = document.getElementById("closeDropdownButton");
 const closeSignIn = document.getElementById("closeSignIn");
-
-document.body.style.backgroundColor =
-  colors[Math.floor(Math.random() * colors.length - 1)];
+const closeLiked = document.getElementById("closeLiked");
+const navLikeButton = document.getElementById("navLikeButton");
+const gridContainer = document.getElementById("gridContainer");
 
 button.addEventListener("click", captureScreenshot);
 nextButton.addEventListener("click", nextQuote);
@@ -61,15 +61,9 @@ closeDropdownButton.addEventListener("click", hideDropdown);
 closeSignIn.addEventListener("click", hideSignIn);
 window.addEventListener("resize", changeMaskPorperties);
 
-window.addEventListener("click", function (e) {
-  if (!signUpDiv.contains(e.target) && !profileImage.contains(e.target)) {
-    signUpDiv.style.display = "none";
-    maskElement.style.display = "block";
-    quoteContent.style.display = "block";
-    authorContainer.style.display = "block";
-    likeButton.style.display = "block";
-  }
-});
+navLikeButton.addEventListener("click", buildLikeGrid);
+
+closeLiked.addEventListener("click", hideLiked);
 
 function fetchQuotes() {
   fetch("https://api.quotable.io/quotes/random?limit=10&maxLength=200")
@@ -95,7 +89,13 @@ function updateQuote() {
   changeMaskPorperties();
 
   // Check if the current quote is in the liked quotes array
-  liked = likedQuotes.includes(index);
+  const isLiked = likedQuotes.some(
+    (quote) =>
+      quote.content === cars[index].content &&
+      quote.author === cars[index].author
+  );
+  console.log(isLiked);
+  liked = isLiked;
   updateLikeButton();
 }
 
@@ -109,22 +109,19 @@ likeButton.addEventListener("click", () => {
   console.log("asdasdasd");
   if (liked) {
     // Remove the current quote index from the liked quotes array
-    const likedIndex = likedQuotes.indexOf(index);
+    const likedIndex = likedQuotes.indexOf(cars[index]);
     if (likedIndex > -1) {
       likedQuotes.splice(likedIndex, 1);
     }
   } else {
     // Add the current quote index to the liked quotes array
-    likedQuotes.push(index);
-
-    if (currentUser) {
-      // Save the liked quote to the database
-      saveLikedQuote(currentUser.user.email, cars[index]);
-    }
+    likedQuotes.push(cars[index]);
   }
 
   liked = !liked;
   updateLikeButton();
+
+  upsertToDatabase();
 });
 
 function captureScreenshot() {
@@ -243,24 +240,6 @@ profileImage.addEventListener("click", async () => {
   }
 });
 
-async function saveLikedQuote(email, quote) {
-  try {
-    const { data, error } = await supabase
-    .from('table')
-    .insert({ email: email, liked_quotes: quote })
-    .select()
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    console.log("Liked quote saved successfully:", data);
-  } catch (error) {
-    console.error("Error saving liked quote:", error);
-  }
-}
-
-
 function openSignIn() {
   signUpDiv.style.display = "flex";
   maskElement.style.display = "none";
@@ -307,6 +286,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   console.log("aongus: ", event, "sus: ", session);
   currentUser = session;
   if (session) {
+    getUserLikes();
+    navLikeButton.style.display = "flex";
     if (session.user.user_metadata.avatar_url) {
       profileImage.src = session.user.user_metadata.avatar_url;
       profilePictureDropDown.src = session.user.user_metadata.avatar_url;
@@ -350,6 +331,100 @@ function hideSignIn() {
   likeButton.style.display = "block";
 }
 
+function hideLiked() {
+  document.getElementById("gridWrap").style.display = "none";
+  navLikeButton.style.display = "flex";
+  maskElement.style.display = "block";
+  quoteContent.style.display = "block";
+  authorContainer.style.display = "block";
+  likeButton.style.display = "block";
+}
+
 function hideDropdown() {
   dropdownContent.style.display = "none";
+}
+
+async function getUserLikes() {
+  if (currentUser) {
+    const { data, error } = await supabase
+      .from("table")
+      .select("liked_quotes")
+      .eq("email", currentUser.user.email);
+
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(data[0].liked_quotes);
+      data[0].liked_quotes.forEach((element) => {
+        console.log(element);
+        likedQuotes.push(element);
+      });
+      sortLikedQuotes();
+      console.log(likedQuotes);
+    }
+  }
+}
+
+function upsertToDatabase() {
+  sortLikedQuotes();
+  supabase
+    .from("table")
+    .upsert({
+      email: currentUser.user.email,
+      liked_quotes: likedQuotes,
+    })
+    .then((response) => {
+      if (response.error) {
+        console.error(response.error);
+      } else {
+        console.log("Upsert operation successful");
+        getUserLikes();
+      }
+    })
+    .catch((error) => {
+      console.error("Error during upsert operation:", error);
+    });
+}
+
+function sortLikedQuotes() {
+  // Create a set of unique maps
+  let uniqueMaps = new Set(likedQuotes.map(JSON.stringify));
+
+  // Convert the set back to an array
+  let uniqueMapsArray = Array.from(uniqueMaps).map(JSON.parse);
+
+  // Print the unique maps
+  uniqueMapsArray.forEach((mapItem) => {
+    console.log(mapItem);
+  });
+  likedQuotes = uniqueMapsArray;
+  console.log("sorted list: " + likedQuotes.toString());
+}
+
+async function buildLikeGrid() {
+  maskElement.style.display = "none";
+  quoteContent.style.display = "none";
+  authorContainer.style.display = "none";
+  likeButton.style.display = "none";
+  navLikeButton.style.display = "none";
+  document.getElementById("gridWrap").style.display = "flex";
+
+  // Create div elements for each item in the array
+  likedQuotes.forEach(function (item) {
+    console.log(item);
+    var div = document.createElement("div");
+    var title = document.createElement("h3");
+    var author = document.createElement("p");
+    var contentWrap = document.createElement("div");
+    contentWrap.style.padding = "20px";
+    div.className = "grid-item";
+    title.innerText = item.content;
+    author.innerText = "-" + item.author;
+    gridContainer.appendChild(div);
+    div.appendChild(contentWrap);
+    contentWrap.appendChild(title);
+    contentWrap.appendChild(author);
+    title.className = "title";
+    author.className = "author";
+  });
 }

@@ -24,15 +24,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1"></script>
   </head>
   <body>
-    <!-- <div class="action-row">
-      <div class="action-items">
-        <button id="theme-button" class="theme-button">
-          <i class="bi-brush bi"></i>
-        </button>
-        <img src="user.png" alt="" id="profile-image" />
-      </div>
-    </div> -->
-
+    <div class="gridWrap" id="gridWrap" style="display: none;">
+      <button id="closeLiked">x</button>
+      <div class="gridContainer" id="gridContainer"></div>
+    </div>
+    
     <div class="signUp-div" id="signUp-div" style="display: none">
       <button id="closeSignIn">x</button>
       <p style="color: white; font-size: 30px">you need to sign in :(</p>
@@ -72,6 +68,9 @@
       <button id="theme-button" class="nav-elemnt">
         <i class="bi-droplet-half"></i>
       </button>
+      <button id="navLikeButton" class="navLikeButton" style="display: none;">
+        <i class="bi bi-heart"></i>
+      </button>
       <div class="dropdown nav-elemnt">
         <img src="user.png" alt="" class="profile-image" id="profile-image" />
 
@@ -103,7 +102,7 @@
       <div class="color-square" style="background-color: #2a9d8f"></div>
 
       <div class="color-square" style="background-color: #e63946"></div>
-      <div class="color-square" style="background-color: #c1121f"></div>
+      <div class="color-square" style="background-color: #386641"></div>
       <div class="color-square" style="background-color: #e76f51"></div>
       <div class="color-square" style="background-color: #fc3e3e"></div>
 
