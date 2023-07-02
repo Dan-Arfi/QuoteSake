@@ -105,23 +105,27 @@ document.body.onkeydown = async function (e) {
   }
 };
 
-likeButton.addEventListener("click", () => {
-  console.log("asdasdasd");
-  if (liked) {
-    // Remove the current quote index from the liked quotes array
-    const likedIndex = likedQuotes.indexOf(cars[index]);
-    if (likedIndex > -1) {
-      likedQuotes.splice(likedIndex, 1);
+likeButton.addEventListener("click", function () {
+  if (currentUser) {
+    console.log("asdasdasd");
+    if (liked) {
+      // Remove the current quote index from the liked quotes array
+      const likedIndex = likedQuotes.indexOf(cars[index]);
+      if (likedIndex > -1) {
+        likedQuotes.splice(likedIndex, 1);
+      }
+    } else {
+      // Add the current quote index to the liked quotes array
+      likedQuotes.push(cars[index]);
     }
+
+    liked = !liked;
+    updateLikeButton();
+
+    upsertToDatabase();
   } else {
-    // Add the current quote index to the liked quotes array
-    likedQuotes.push(cars[index]);
+    openSignIn();
   }
-
-  liked = !liked;
-  updateLikeButton();
-
-  upsertToDatabase();
 });
 
 function captureScreenshot() {
