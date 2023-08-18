@@ -324,9 +324,7 @@ body {
 }
 
 .color-picker .color-square:hover {
-  width: 56px;
-  height: 36px;
-  margin: 0px;
+  scale: 125%;
 
 }
 
